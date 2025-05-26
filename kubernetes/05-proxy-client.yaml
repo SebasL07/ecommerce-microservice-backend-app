@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-client
+
+spec:
+  selector:
+    app: proxy-client
+  ports:
+  - port: 8900
+    targetPort: 8900
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-client
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy-client
+  template:
+    metadata:
+      labels:
+        app: proxy-client
+    spec:
+      containers:
+      - name: proxy-client
+        image: sebasl07/proxy-client-ecommerce-boot:0.1.0
+        ports:
+        - containerPort: 8900
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "dev"
+        - name: SPRING_ZIPKIN_BASE_URL
+          value: "http://zipkin:9411/"
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: "http://service-discovery:8761/eureka/"
+        - name: SPRING_CLOUD_CONFIG_URI
+          value: "http://cloud-config:9296"
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.2"
+            memory: "256Mi"
