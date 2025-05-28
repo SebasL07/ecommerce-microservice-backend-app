@@ -1,9 +1,22 @@
 #!/bin/bash
 # Script para desplegar los servicios en Kubernetes
-# Fecha: 25 de mayo de 2025
+# Fecha: 26 de mayo de 2025
 
-# Configuración
-WAIT_TIME=30  # Tiempo de espera entre servicios en segundos
+# Configuración de tiempos de espera (en segundos) para cada servicio
+declare -A WAIT_TIMES
+WAIT_TIMES=(
+    ["01-zipkin.yaml"]=10
+    ["02-service-discovery.yaml"]=150  # Eureka necesita más tiempo para iniciar
+    ["03-cloud-config.yaml"]=80       # Config Server también necesita tiempo
+    ["04-api-gateway.yaml"]=30
+    ["05-proxy-client.yaml"]=30
+    ["06-order-service.yaml"]=20
+    ["07-payment-service.yaml"]=15
+    ["08-product-service.yaml"]=15
+    ["09-shipping-service.yaml"]=15
+    ["10-user-service.yaml"]=20
+    ["11-favourite-service.yaml"]=0   # El último servicio no necesita espera
+)
 
 # Lista de archivos YAML en orden de aplicación
 YAML_FILES=(
@@ -42,13 +55,26 @@ if ! command -v kubectl &> /dev/null; then
 fi
 
 # Verificar conexión con el clúster
-if ! kubectl cluster-info &> /dev/null; then
-    print_message "Error: No se pudo conectar al clúster de Kubernetes." "$RED"
-    print_message "Verifique que su configuración de kubectl esté correcta y que tenga acceso al clúster." "$RED"
-    exit 1
-fi
+print_message "Verificando conexión al clúster de Kubernetes..." "$CYAN"
+connection_attempts=0
+max_attempts=3
 
-print_message "Conectado al clúster de Kubernetes." "$GREEN"
+while [ $connection_attempts -lt $max_attempts ]; do
+    if kubectl cluster-info --request-timeout=30s &> /dev/null; then
+        print_message "Conectado al clúster de Kubernetes." "$GREEN"
+        break
+    else
+        connection_attempts=$((connection_attempts+1))
+        if [ $connection_attempts -eq $max_attempts ]; then
+            print_message "Error: No se pudo conectar al clúster de Kubernetes después de $max_attempts intentos." "$RED"
+            print_message "Verifique que su configuración de kubectl esté correcta y que tenga acceso al clúster." "$RED"
+            exit 1
+        else
+            print_message "Intento $connection_attempts de $max_attempts: No se pudo conectar al clúster. Intentando de nuevo en 5 segundos..." "$YELLOW"
+            sleep 5
+        fi
+    fi
+done
 
 # Directorio de trabajo
 KUBERNETES_DIR="$(dirname "$0")/kubernetes"
@@ -70,20 +96,28 @@ for yaml_file in "${YAML_FILES[@]}"; do
     print_message "Aplicando $yaml_file ($service_name)" "$CYAN"
     print_message "============================================" "$CYAN"
     
-    # Aplicar el archivo YAML
-    kubectl apply -f "$yaml_path"
+    # Aplicar el archivo YAML con validación desactivada para evitar problemas de TLS
+    kubectl apply -f "$yaml_path" --validate=false
     
     if [ $? -ne 0 ]; then
-        print_message "Error al aplicar $yaml_file. Verifique los logs para más detalles." "$RED"
-        continue
+        print_message "Error al aplicar $yaml_file. Intentando de nuevo sin validación." "$YELLOW"
+        kubectl apply -f "$yaml_path" --validate=false --force
+        
+        if [ $? -ne 0 ]; then
+            print_message "Error al aplicar $yaml_file. Verifique los logs para más detalles." "$RED"
+            continue
+        fi
     fi
     
     print_message "Servicio $service_name aplicado correctamente." "$GREEN"
     
+    # Obtener el tiempo de espera para este servicio
+    wait_time=${WAIT_TIMES[$yaml_file]}
+    
     # Esperar antes de continuar con el siguiente servicio (excepto para el último)
-    if [ "$yaml_file" != "${YAML_FILES[-1]}" ]; then
-        print_message "Esperando $WAIT_TIME segundos antes de continuar con el siguiente servicio..." "$YELLOW"
-        sleep $WAIT_TIME
+    if [ "$yaml_file" != "${YAML_FILES[-1]}" ] && [ $wait_time -gt 0 ]; then
+        print_message "Esperando $wait_time segundos antes de continuar con el siguiente servicio..." "$YELLOW"
+        sleep $wait_time
     fi
 done
 

@@ -26,9 +26,10 @@ spec:
       labels:
         app: cloud-config
     spec:
-      containers:
+      containers:      
       - name: cloud-config
         image: sebasl07/cloud-config-ecommerce-boot:0.1.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 9296
         env:
@@ -36,6 +37,8 @@ spec:
           value: "dev"
         - name: SPRING_ZIPKIN_BASE_URL
           value: "http://zipkin:9411/"
+        - name: EUREKA_INSTANCE
+          value: "cloud-config"
         resources:
           limits:
             cpu: "0.5"

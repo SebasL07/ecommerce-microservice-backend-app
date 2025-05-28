@@ -1,9 +1,21 @@
 # Script para desplegar los servicios en Kubernetes
 # Autor: GitHub Copilot
-# Fecha: 25 de mayo de 2025
+# Fecha: 26 de mayo de 2025
 
-# Configuración
-$waitTimeInSeconds = 30  # Tiempo de espera entre servicios
+# Configuración de tiempos de espera (en segundos) para cada servicio
+$waitTimes = @{
+    "01-zipkin.yaml" = 10
+    "02-service-discovery.yaml" = 45  # Eureka necesita más tiempo para iniciar
+    "03-cloud-config.yaml" = 30       # Config Server también necesita tiempo
+    "04-api-gateway.yaml" = 20
+    "05-proxy-client.yaml" = 15
+    "06-order-service.yaml" = 20
+    "07-payment-service.yaml" = 15
+    "08-product-service.yaml" = 15
+    "09-shipping-service.yaml" = 15
+    "10-user-service.yaml" = 20
+    "11-favourite-service.yaml" = 0   # El último servicio no necesita espera
+}
 
 # Lista de archivos YAML en orden de aplicación
 $yamlFiles = @(
@@ -30,7 +42,7 @@ function Write-ColorOutput {
 }
 
 # Función para verificar si kubectl está instalado
-function Check-KubectlInstalled {
+function Test-KubectlInstalled {
     try {
         $null = kubectl version --client
         return $true
@@ -41,21 +53,35 @@ function Check-KubectlInstalled {
 }
 
 # Verificar si kubectl está instalado
-if (-not (Check-KubectlInstalled)) {
+if (-not (Test-KubectlInstalled)) {
     Write-ColorOutput "Error: kubectl no está instalado o no está en el PATH." "Red"
     Write-ColorOutput "Por favor, instale kubectl antes de ejecutar este script." "Red"
     exit 1
 }
 
 # Verificar conexión con el clúster
-try {
-    $null = kubectl cluster-info
-    Write-ColorOutput "Conectado al clúster de Kubernetes." "Green"
-}
-catch {
-    Write-ColorOutput "Error: No se pudo conectar al clúster de Kubernetes." "Red"
-    Write-ColorOutput "Verifique que su configuración de kubectl esté correcta y que tenga acceso al clúster." "Red"
-    exit 1
+Write-ColorOutput "Verificando conexión al clúster de Kubernetes..." "Cyan"
+$connectionAttempts = 0
+$maxAttempts = 3
+
+while ($connectionAttempts -lt $maxAttempts) {
+    try {
+        $null = kubectl cluster-info --request-timeout=30s
+        Write-ColorOutput "Conectado al clúster de Kubernetes." "Green"
+        break
+    }
+    catch {
+        $connectionAttempts++
+        if ($connectionAttempts -eq $maxAttempts) {
+            Write-ColorOutput "Error: No se pudo conectar al clúster de Kubernetes después de $maxAttempts intentos." "Red"
+            Write-ColorOutput "Verifique que su configuración de kubectl esté correcta y que tenga acceso al clúster." "Red"
+            exit 1
+        }
+        else {
+            Write-ColorOutput "Intento $connectionAttempts de $maxAttempts - No se pudo conectar al clúster. Intentando de nuevo en 5 segundos..." "Yellow"
+            Start-Sleep -Seconds 5
+        }
+    }
 }
 
 # Directorio de trabajo
@@ -77,21 +103,27 @@ foreach ($yamlFile in $yamlFiles) {
     Write-ColorOutput "============================================" "Cyan"
     Write-ColorOutput "Aplicando $yamlFile ($serviceName)" "Cyan"
     Write-ColorOutput "============================================" "Cyan"
-    
-    # Aplicar el archivo YAML
-    kubectl apply -f $yamlPath
+      # Aplicar el archivo YAML con validación desactivada para evitar problemas de TLS
+    kubectl apply -f $yamlPath --validate=false
     
     if ($LASTEXITCODE -ne 0) {
-        Write-ColorOutput "Error al aplicar $yamlFile. Verifique los logs para más detalles." "Red"
-        continue
+        Write-ColorOutput "Error al aplicar $yamlFile. Intentando de nuevo sin validación." "Yellow"
+        kubectl apply -f $yamlPath --validate=false --force
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-ColorOutput "Error al aplicar $yamlFile. Verifique los logs para más detalles." "Red"
+            continue
+        }
     }
+      Write-ColorOutput "Servicio $serviceName aplicado correctamente." "Green"
     
-    Write-ColorOutput "Servicio $serviceName aplicado correctamente." "Green"
+    # Obtener el tiempo de espera para este servicio
+    $waitTime = $waitTimes[$yamlFile]
     
     # Esperar antes de continuar con el siguiente servicio (excepto para el último)
-    if ($yamlFile -ne $yamlFiles[-1]) {
-        Write-ColorOutput "Esperando $waitTimeInSeconds segundos antes de continuar con el siguiente servicio..." "Yellow"
-        Start-Sleep -Seconds $waitTimeInSeconds
+    if ($yamlFile -ne $yamlFiles[-1] -and $waitTime -gt 0) {
+        Write-ColorOutput "Esperando $waitTime segundos antes de continuar con el siguiente servicio..." "Yellow"
+        Start-Sleep -Seconds $waitTime
     }
 }
 
