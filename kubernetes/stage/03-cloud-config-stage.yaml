@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-config
+
+spec:
+  selector:
+    app: cloud-config
+  ports:
+  - port: 9296
+    targetPort: 9296
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-config
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-config
+  template:
+    metadata:
+      labels:
+        app: cloud-config
+    spec:
+      containers:      
+      - name: cloud-config
+        image: sebasl07/cloud-config-ecommerce-boot:0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9296
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "stage"
+        - name: SPRING_ZIPKIN_BASE_URL
+          value: "http://zipkin:9411/"
+        - name: EUREKA_INSTANCE
+          value: "cloud-config"
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.2"
+            memory: "256Mi"

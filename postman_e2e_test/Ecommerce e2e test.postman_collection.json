@@ -1,0 +1,558 @@
+{
+	"info": {
+		"_postman_id": "42c2a182-3cf1-4b15-8f70-53f81dae461f",
+		"name": "Ecommerce e2e test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43473998",
+		"_collection_link": "https://alquilerteam.postman.co/workspace/Ingesoft~f3cbdee7-3a46-44a5-8192-7775cefecb4f/collection/43473998-42c2a182-3cf1-4b15-8f70-53f81dae461f?action=share&source=collection_link&creator=43473998"
+	},
+	"item": [
+		{
+			"name": "UserService",
+			"item": [
+				{
+					"name": "create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"userId\", response.userId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Carlos\",\r\n    \"lastName\": \"Arbitro\",\r\n    \"email\": \"carlos@example.com\",\r\n    \"phone\": \"0987654321\",\r\n    \"imageUrl\": \"https://example.com/profile.jpg\",\r\n    \"credential\": {\r\n        \"username\": \"carlitos\",\r\n        \"password\": \"$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy\",\r\n        \"roleBasedAuthority\": \"ROLE_USER\",\r\n        \"isEnabled\": true,\r\n        \"isAccountNonExpired\": true,\r\n        \"isAccountNonLocked\": true,\r\n        \"isCredentialsNonExpired\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user-service/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-service",
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create address",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullAddress\": \"123 Calle 1ra\",\r\n  \"postalCode\": \"760000\",\r\n  \"city\": \"Cali\",\r\n  \"user\": {\r\n    \"userId\": \"{{userId}}\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user-service/api/address",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-service",
+								"api",
+								"address"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user-service/api/users{{userId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-service",
+								"api",
+								"users{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ProductService",
+			"item": [
+				{
+					"name": "create category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"categoryId\", response.categoryId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"categoryTitle\": \"Electronics\",\r\n    \"imageUrl\": \"http://example.com/profile.jpg\",\r\n    \"parentCategory\": {\r\n                        \"categoryId\": 1\r\n                    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product-service/api/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product-service",
+								"api",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"productId\", response.productId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productTitle\": \"Camara EOS RP\",\r\n  \"imageUrl\": \"https://example.com/images/canon.jpg\",\r\n  \"sku\": \"CAM-ABC-456\",\r\n  \"priceUnit\": 599.99,\r\n  \"quantity\": 20,\r\n  \"category\": {\r\n    \"categoryId\": \"{{categoryId}}\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product-service/api/products/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product-service",
+								"api",
+								"products",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is less than 500ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Test for the specific product details\r",
+									"pm.test(\"Verify product details\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.productTitle).to.equal(\"Camara EOS RP\");\r",
+									"    pm.expect(response.sku).to.equal(\"CAM-ABC-456\");\r",
+									"    pm.expect(response.priceUnit).to.equal(599.99);\r",
+									"    pm.expect(response.quantity).to.equal(20);\r",
+									"    pm.expect(response.category.categoryId).to.equal(5);\r",
+									"    pm.expect(response.category.categoryTitle).to.equal(\"Electronics\");\r",
+									"    pm.expect(response.category.imageUrl).to.equal(\"http://example.com/profile.jpg\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product-service/api/products/{{productId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product-service",
+								"api",
+								"products",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FavouriteService",
+			"item": [
+				{
+					"name": "create favourite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"{{userId}}\",\r\n  \"productId\": \"{{productId}}\",\r\n  \"likeDate\": \"25-05-2025__12:30:00:000000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/favourite-service/api/favourites",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"favourite-service",
+								"api",
+								"favourites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get favourite",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/favourite-service/api/favourites/finde¿",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"favourite-service",
+								"api",
+								"favourites",
+								"finde¿"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PaymentService",
+			"item": [
+				{
+					"name": "create cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json()\r",
+									"\r",
+									"pm.collectionVariables.set(\"cartId\", response.cartId)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"{{userId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order-service/api/carts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order-service",
+								"api",
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set(\"orderId\", response.orderId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"orderDate\": \"25-05-2025__12:30:00:868194\",\r\n  \"orderDesc\": \"Sample order with smartphone\",\r\n  \"orderFee\": 599.99,\r\n  \"cart\": {\r\n    \"cartId\": \"{{cartId}}\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/order-service/api/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"order-service",
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create payment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"isPayed\": false,\r\n  \"paymentStatus\": \"NOT_STARTED\",\r\n  \"order\": {\r\n    \"orderId\": \"{{orderId}}\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/payment-service/api/payments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment-service",
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get payment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payment-service/api/payments/{{paymentId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment-service",
+								"api",
+								"payments",
+								"{{paymentId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ShippingService",
+			"item": [
+				{
+					"name": "create shipping",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": \"{{productId}}\",\r\n  \"orderId\": \"{{orderId}}\",\r\n  \"orderedQuantity\": 2,\r\n  \"product\": {\r\n    \"productId\": \"{{productId}}\"\r\n  },\r\n  \"order\": {\r\n    \"orderId\": \"{{orderId}}\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/shipping-service/api/shippings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipping-service",
+								"api",
+								"shippings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get shipping",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/shipping-service/api/shippings/find",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shipping-service",
+								"api",
+								"shippings",
+								"find"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "categoryId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cartId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "paymentId",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

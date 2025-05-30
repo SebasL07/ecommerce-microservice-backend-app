@@ -1,4 +1,4 @@
-/* package com.selimhorri.app.resource.integration;
+package com.selimhorri.app.resource.integration;
 
 import com.selimhorri.app.dto.UserDto;
 import com.selimhorri.app.dto.response.collection.DtoCollectionResponse;
@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 public class UserResourceIntegrationTest {
 
     @LocalServerPort
@@ -124,4 +124,3 @@ public class UserResourceIntegrationTest {
         assertEquals(saved.getFirstName(), found.getFirstName());
     }
 }
- */
