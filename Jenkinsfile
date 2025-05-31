@@ -68,11 +68,12 @@ pipeline {
                 else
                     echo "Node.js ya está instalado"
                 fi
-                
-                # Asegurar que Node.js esté en el PATH
+                  # Asegurar que Node.js esté en el PATH
                 export PATH=$HOME/nodejs/bin:$PATH
                 node --version
-                npm --version# Instalar newman globalmente
+                npm --version
+
+                # Instalar newman globalmente
                 echo "Instalando newman..."
                 npm install -g newman
                 newman --version
@@ -234,9 +235,10 @@ pipeline {
                 echo "Realizando port forwarding para acceder a los servicios"
                 kubectl port-forward service/api-gateway 8080:8080 --address
                 '''
-            }
-        }
-        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE        stage('E2E y Pruebas de Carga') {
+            }        }
+        
+        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
+        stage('E2E y Pruebas de Carga') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
