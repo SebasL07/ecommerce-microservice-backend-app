@@ -77,7 +77,7 @@ pipeline {
         // Pruebas Unitarias solo en DEV
         stage('Unit Tests') {
             when {
-                environment name: 'SELECTED_ENV', value: 'dev'
+                environment name: 'SELECTED_ENV', value: 'stage'
             }
             steps {
                 sh '''
@@ -99,7 +99,7 @@ pipeline {
         // Pruebas de Integración solo en DEV
         stage('Integration Tests') {
             when {
-                environment name: 'SELECTED_ENV', value: 'dev'
+                environment name: 'SELECTED_ENV', value: 'stage'
             }
             steps {
                 sh '''
