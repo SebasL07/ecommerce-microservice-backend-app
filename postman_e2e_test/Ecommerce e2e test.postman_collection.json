@@ -586,7 +586,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080",
+			"value": "http://api-gateway:8080",
 			"type": "string"
 		},
 		{
