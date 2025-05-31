@@ -190,30 +190,38 @@ pipeline {
             }
             steps {
                 sh '''
-                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
-
-                echo "================ DESPLEGAR EN KUBERNETES ================"
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH                echo "================ DESPLEGAR EN KUBERNETES ================"
                 echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
+                
+                # Variables para los sufijos de los archivos
+                if [ "${SELECTED_ENV}" = "dev" ]; then
+                    # En ambiente dev, los archivos no tienen sufijo
+                    SUFFIX=""
+                else
+                    # En ambiente stage o prod, los archivos tienen sufijo con el nombre del ambiente
+                    SUFFIX="-${SELECTED_ENV}"
+                fi
+                
                 # Desplegar Zipkin
-                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin${SUFFIX}.yaml
                 sleep 30
                 # Desplegar Service Discovery (Eureka)
-                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery${SUFFIX}.yaml
                 sleep 60
                 # Desplegar Cloud Config
-                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config${SUFFIX}.yaml
                 sleep 60
                 # Desplegar API Gateway
-                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway${SUFFIX}.yaml
                 sleep 60
                 # Desplegar microservicios
-                kubectl apply -f kubernetes/${SELECTED_ENV}/05-user-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/06-product-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/07-order-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/08-payment-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/10-favourite-service-${SELECTED_ENV}.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/11-proxy-client-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/05-proxy-client${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/06-order-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/07-payment-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/08-product-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/10-user-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/11-favourite-service${SUFFIX}.yaml
                 echo "Verificando que todos los pods estén en ejecución"
                 kubectl get pods
                 '''
