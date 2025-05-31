@@ -35,7 +35,7 @@ pipeline {
 
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
-                ./mvnw clean package -DskipTests
+                ./mvnw clean package "-DskipTests"
                 
                 echo "Verificando Java para Maven:"
                 java -version
@@ -69,10 +69,9 @@ pipeline {
                 export PATH=$HOME/bin:$PATH
                 
                 export JAVA_HOME=$HOME/java11
-                export PATH=$HOME/java11/bin:$PATH
-                ./mvnw clean package -DskipTests
+                export PATH=$HOME/java11/bin:$PATH                ./mvnw clean package "-DskipTests"
 
-                ./mvnw clean package -DskipTests
+                ./mvnw clean package "-DskipTests"
                 '''
             }
         }        
@@ -87,8 +86,7 @@ pipeline {
                 
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
-                
-                echo "Ejecutando pruebas unitarias en ambiente DEV"
+                  echo "Ejecutando pruebas unitarias en ambiente DEV"
                 ./mvnw test
                 '''
             }
@@ -111,7 +109,7 @@ pipeline {
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
                   echo "Ejecutando pruebas de integración en ambiente DEV"
-                ./mvnw verify -Dspring.profiles.active=test -Dtest=none -DfailIfNoTests=false -DskipTests=true -Dit.test=*IT,*Integration*,*IntegrationTest*
+                ./mvnw verify "-Dspring.profiles.active=test" "-Dtest=none" "-DfailIfNoTests=false" "-DskipTests=true" "-Dit.test=*IT,*Integration*,*IntegrationTest*"
                 '''
             }
             post {
