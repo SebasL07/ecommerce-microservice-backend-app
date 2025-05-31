@@ -35,6 +35,7 @@ pipeline {
 
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
+                ./mvnw clean package -DskipTests
                 
                 echo "Verificando Java para Maven:"
                 java -version
@@ -64,6 +65,17 @@ pipeline {
         stage('Build Maven') {
             steps {
                 sh '''
+
+                export PATH=$HOME/bin:$PATH
+                
+                export JAVA_HOME=$HOME/java11
+                export PATH=$HOME/java11/bin:$PATH
+                ./mvnw clean package -DskipTests
+                
+                echo "Verificando Java para Maven:"
+                java -version
+                javac -version
+
                 ./mvnw clean package -DskipTests
                 '''
             }
