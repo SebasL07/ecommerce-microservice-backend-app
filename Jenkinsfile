@@ -281,6 +281,71 @@ pipeline {
                 always {
                     archiveArtifacts artifacts: 'locust/load_test_report*.csv', allowEmptyArchive: true
                 }
+            }        }
+        
+        // Generar Release Notes solo en PROD
+        stage('Generar Release Notes') {
+            when {
+                environment name: 'SELECTED_ENV', value: 'prod'
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+                    script {
+                        def now = new Date()
+                        def tag = "v${now.format('yyyy.MM.dd.HHmm')}"
+                        def title = "Production Release ${tag}"
+                        def commitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                        def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+                        
+                        sh """
+                            # Configurar Git
+                            git config user.email "jenkins-ci@ecommerce.com"
+                            git config user.name "Jenkins CI"
+                            git config --global url."https://oauth2:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+                            
+                            # Crear tag y push
+                            git tag ${tag} -m "Production deployment - Build #${env.BUILD_NUMBER}"
+                            git push origin ${tag}
+                            
+                            # Crear release con notas
+                            gh release create ${tag} --generate-notes --title "${title}" --notes "
+                            # 🚀 Release Notes - ${tag}
+
+                            **📅 Fecha:** ${now.format('yyyy-MM-dd HH:mm:ss')}  
+                            **👤 Responsable:** Jenkins CI  
+                            **🔗 Build:** #${env.BUILD_NUMBER}  
+                            **🔑 Commit:** ${commitHash}  
+
+                            ## 📋 **Resumen del Release**
+                            Despliegue automático del sistema de ecommerce con microservicios en ambiente de producción.
+
+                            ## 🆕 **Último Cambio**
+                            ${commitMessage}
+
+                            ## ✅ **Validaciones Realizadas**
+                            - ✅ Pruebas End-to-End ejecutadas exitosamente
+                            - ✅ Verificación de conectividad entre microservicios  
+                            - ✅ Validación de endpoints principales
+                            - ✅ Confirmación de registro en Eureka
+
+                            ## 🏗️ **Servicios Desplegados**
+                            - API Gateway (Puerto 8080)
+                            - Service Discovery - Eureka (Puerto 8761)  
+                            - Zipkin Tracing (Puerto 9411)
+                            - Microservicios: Product, Order, Payment, User, Shipping, Favourite
+
+                            ## 🚨 **Información Importante**
+                            - Los servicios pueden tardar 2-3 minutos en estar completamente operativos
+                            - Verificar conectividad de red antes de acceder a los endpoints
+                            - En caso de problemas, contactar al equipo DevOps
+                            "
+                        """
+                        
+                        echo "✅ Release ${tag} creado exitosamente"
+                        echo "📋 Release Notes generadas según buenas prácticas de Change Management"
+                        echo "🔗 Disponible en GitHub Releases"
+                    }
+                }
             }
         }
  
@@ -290,9 +355,28 @@ pipeline {
         always {
             echo "Limpiando espacio de trabajo..."
             cleanWs()
-        }
-        success {
-            echo "Pipeline finalizado exitosamente para ${SELECTED_ENV}"
+        }        success {
+            script {
+                if (env.SELECTED_ENV == 'dev') {
+                    echo "¡Pipeline DEV completado con éxito!"
+                    echo "Los microservicios están compilados y listos para desarrollo."
+                } else if (env.SELECTED_ENV == 'stage') {
+                    echo "¡Pipeline STAGE completado con éxito!"
+                    echo "Todas las pruebas han pasado exitosamente:"
+                    echo "- Pruebas unitarias ✓"
+                    echo "- Pruebas de integración ✓"
+                    echo "- Pruebas E2E ✓"
+                    echo "- Pruebas de carga (Locust) ✓"
+                    echo "La aplicación está lista para producción."
+                } else if (env.SELECTED_ENV == 'prod') {
+                    echo "¡Pipeline PROD completado con éxito!"
+                    echo "La aplicación está desplegada en producción."
+                    echo "- Release Notes generadas ✓"
+                    echo "Los servicios están disponibles en el cluster de Kubernetes."
+                }
+            }
+            echo "Puedes acceder a la interfaz de Eureka a través del servicio service-discovery."
+            echo "El API Gateway está disponible a través del servicio api-gateway."
         }
         failure {
             echo "Pipeline falló para ${SELECTED_ENV}"
