@@ -235,10 +235,13 @@ pipeline {
                     environment name: 'SELECTED_ENV', value: 'prod'
                     environment name: 'SELECTED_ENV', value: 'stage'
                 }
-            }
+            }            
+            
             steps {
                 sh '''
-                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH                echo "================ VERIFICAR DESPLIEGUE Y PORT FORWARDING ================"
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
+                
+                echo "================ VERIFICAR DESPLIEGUE Y PORT FORWARDING ================"
                 echo "Verificando el despliegue en ambiente ${SELECTED_ENV}"
                 kubectl get pods
                 kubectl get services
