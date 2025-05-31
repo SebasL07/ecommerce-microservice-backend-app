@@ -159,7 +159,7 @@ pipeline {
             }
         } 
         // Pruebas Unitarias solo en Stage
-        /* stage('Unit Tests') {
+        stage('Unit Tests') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
@@ -173,11 +173,11 @@ pipeline {
                 ./mvnw test
                 '''
             }
-            
-        } */
+        
+        } 
         // Pruebas de Integración solo en stage
         
-        /* stage('Integration Tests') {
+        stage('Integration Tests') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
@@ -193,9 +193,9 @@ pipeline {
             }
             
         }
-        */
         
-/* 
+        
+
         // Despliegue en Kubernetes en STAGE y PROD
         stage('Desplegar en Kubernetes') {
             when {
@@ -273,7 +273,7 @@ pipeline {
             
                 '''
             }        
-        } */
+        } 
 
           // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
