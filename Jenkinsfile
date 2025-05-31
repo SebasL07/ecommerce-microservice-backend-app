@@ -247,7 +247,7 @@ pipeline {
                 kubectl get services
                 echo "Servicios desplegados correctamente. En lugar de hacer port-forwarding, simplemente verificaremos que los servicios estén disponibles."
                 kubectl get service api-gateway -o wide
-                echo "Para acceder al API Gateway, usa: kubectl port-forward service/api-gateway 8081:8080 --address=0.0.0.0"
+                kubectl port-forward service/api-gateway 8080:8080 --address=0.0.0.0
                 '''
             }        }
           // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
