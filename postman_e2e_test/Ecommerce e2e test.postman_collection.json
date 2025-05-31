@@ -20,6 +20,7 @@
 									"let response = pm.response.json();\r",
 									"\r",
 									"pm.collectionVariables.set(\"userId\", response.userId);\r",
+									"pm.collectionVariables.set(\"credentialId\", response.credential.credentialId)\r",
 									""
 								],
 								"type": "text/javascript",
@@ -103,7 +104,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"credentialId\": 5,\r\n    \"username\": \"carlitos\",\r\n    \"password\": \"$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy\",\r\n    \"roleBasedAuthority\": \"ROLE_USER\",\r\n    \"isEnabled\": true,\r\n    \"isAccountNonExpired\": true,\r\n    \"isAccountNonLocked\": true,\r\n    \"isCredentialsNonExpired\": true,\r\n    \"userDto\" : {\r\n        \"userId\" : {{userId}}\r\n    }\r\n}",
+							"raw": "{\r\n    \"credentialId\": {{credentialId}},\r\n    \"username\": \"carlitos\",\r\n    \"password\": \"$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy\",\r\n    \"roleBasedAuthority\": \"ROLE_USER\",\r\n    \"isEnabled\": true,\r\n    \"isAccountNonExpired\": true,\r\n    \"isAccountNonLocked\": true,\r\n    \"isCredentialsNonExpired\": true,\r\n    \"user\" : {\r\n        \"userId\" : {{userId}}\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -111,14 +112,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/user-service/api/users",
+							"raw": "{{base_url}}/user-service/api/credentials",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"user-service",
 								"api",
-								"users"
+								"credentials"
 							]
 						}
 					},
@@ -261,7 +262,6 @@
 									"    pm.expect(response.sku).to.equal(\"CAM-ABC-456\");\r",
 									"    pm.expect(response.priceUnit).to.equal(599.99);\r",
 									"    pm.expect(response.quantity).to.equal(20);\r",
-									"    pm.expect(response.category.categoryId).to.equal(5);\r",
 									"    pm.expect(response.category.categoryTitle).to.equal(\"Electronics\");\r",
 									"    pm.expect(response.category.imageUrl).to.equal(\"http://example.com/profile.jpg\");\r",
 									"});\r",
@@ -586,7 +586,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://api-gateway:8080",
+			"value": "http://localhost:8080",
 			"type": "string"
 		},
 		{

@@ -235,7 +235,7 @@ pipeline {
             }
         }
         // Verificar Despliegue y port forwarding en STAGE y PROD
-        stage('Verificar Despliegue y port forwarding') {
+        stage('Verificar Despliegue') {
             when {
                 anyOf {
                     environment name: 'SELECTED_ENV', value: 'prod'
