@@ -76,7 +76,9 @@ pipeline {
                 # Instalar newman globalmente
                 echo "Instalando newman..."
                 npm install -g newman
-                newman --version                if [ "${SELECTED_ENV}" = "stage" ]; then
+                newman --version                
+                
+                if [ "${SELECTED_ENV}" = "stage" ]; then
                     echo "Verificando Docker para pruebas de carga..."
                     # Verificar si Docker está instalado
                     if ! command -v docker &> /dev/null; then
