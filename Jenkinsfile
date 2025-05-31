@@ -67,10 +67,9 @@ pipeline {
                 sh '''
 
                 export PATH=$HOME/bin:$PATH
-                
                 export JAVA_HOME=$HOME/java11
-                export PATH=$HOME/java11/bin:$PATH                ./mvnw clean package "-DskipTests"
-
+                export PATH=$HOME/java11/bin:$PATH
+                
                 ./mvnw clean package "-DskipTests"
                 '''
             }
