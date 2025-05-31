@@ -195,25 +195,25 @@ pipeline {
                 echo "================ DESPLEGAR EN KUBERNETES ================"
                 echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
                 # Desplegar Zipkin
-                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin-${SELECTED_ENV}.yaml
                 sleep 30
                 # Desplegar Service Discovery (Eureka)
-                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery-${SELECTED_ENV}.yaml
                 sleep 60
                 # Desplegar Cloud Config
-                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config-${SELECTED_ENV}.yaml
                 sleep 60
                 # Desplegar API Gateway
-                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway-${SELECTED_ENV}.yaml
                 sleep 60
                 # Desplegar microservicios
-                kubectl apply -f kubernetes/${SELECTED_ENV}/05-user-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/06-product-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/07-order-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/08-payment-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/10-favourite-service.yaml
-                kubectl apply -f kubernetes/${SELECTED_ENV}/11-proxy-client.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/05-user-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/06-product-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/07-order-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/08-payment-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/10-favourite-service-${SELECTED_ENV}.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/11-proxy-client-${SELECTED_ENV}.yaml
                 echo "Verificando que todos los pods estén en ejecución"
                 kubectl get pods
                 '''
