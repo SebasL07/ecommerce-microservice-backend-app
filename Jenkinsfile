@@ -298,7 +298,7 @@ pipeline {
                 environment name: 'SELECTED_ENV', value: 'prod'
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: '9f49717f-0ab1-4e09-a0f0-ce432510035d', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
                     script {
                         def now = new Date()
                         def tag = "v${now.format('yyyy.MM.dd.HHmm')}"
