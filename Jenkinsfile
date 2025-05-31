@@ -76,6 +76,21 @@ pipeline {
                 npm install -g newman
                 newman --version
 
+                # Instalar Python3 localmente si no está presente
+                if ! command -v python3 &> /dev/null; then
+                    echo "Python3 no encontrado. Instalando localmente..."
+                    cd /tmp
+                    curl -O https://www.python.org/ftp/python/3.11.8/Python-3.11.8.tgz
+                    tar -xzf Python-3.11.8.tgz
+                    cd Python-3.11.8
+                    ./configure --prefix=$HOME/python3
+                    make -j$(nproc)
+                    make install
+                    export PATH=$HOME/python3/bin:$PATH
+                    echo 'export PATH=$HOME/python3/bin:$PATH' >> ~/.bashrc
+                    cd -
+                fi
+
                 # Instalar Python3 y Locust solo en stage
                 if [ "${SELECTED_ENV}" = "stage" ]; then
                     echo "Verificando e instalando Python para Locust..."
