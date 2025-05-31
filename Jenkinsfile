@@ -299,8 +299,8 @@ pipeline {
                         
                         sh """
                             # Configurar Git
-                            git config user.email "jenkins-ci@ecommerce.com"
-                            git config user.name "Jenkins CI"
+                            git config user.email "sebasgnv0207@gmail.com"
+                            git config user.name "SebasL07"
                             git config --global url."https://oauth2:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
                             
                             # Crear tag y push
