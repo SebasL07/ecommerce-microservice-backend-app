@@ -78,31 +78,27 @@ pipeline {
                 npm install -g newman
                 newman --version                
 
+               # Instalar Python packages usando --user (sin permisos de root)
                 if [ "${SELECTED_ENV}" = "stage" ]; then
-                    echo "Verificando Docker para pruebas de carga..."
-                    # Verificar si Docker está instalado
-                    if ! command -v docker &> /dev/null; then
-                        echo "ADVERTENCIA: Docker no está disponible. Las pruebas con Locust podrían fallar."
-                    else
-                        echo "Docker está disponible: $(docker --version)"
-                        # Pre-pull de imágenes para acelerar las pruebas
-                        docker pull python:3.11-slim
-                    fi
-                else
-                    echo "Saltando verificación de Docker para ambiente ${SELECTED_ENV}"
-                fi
-
-                # Verificar que Python3 esté disponible
-                export PATH=$HOME/python3/bin:$PATH
-                python3 --version
-
-                # Instalar Python3 y Locust solo en stage
-                
-                echo "Verificando e instalando Python para Locust..."
-                export PATH=$HOME/python3/bin:$PATH
-                echo "Instalando locust..."
-                python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
+                    echo "Verificando e instalando Python para Locust..."
                     
+                    # Verificar si Python está disponible
+                    if ! command -v python3 &> /dev/null; then
+                        echo "Python3 no encontrado. Instalando..."
+                        apt-get update && apt-get install -y python3 python3-pip python3-venv
+                        
+                        # Verificar instalación
+                        python3 --version
+                        pip3 --version
+                    else
+                        echo "Python3 ya está disponible: $(python3 --version)"
+                    fi
+                    
+                    echo "Instalando locust..."
+                    python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
+                else
+                    echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
+                fi
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
                 mvn --version
