@@ -80,12 +80,8 @@ pipeline {
                 if [ "${SELECTED_ENV}" = "stage" ]; then
                     echo "Verificando e instalando Python para Locust..."
                     if ! command -v python3 &> /dev/null; then
-                        echo "Python3 no encontrado. Instalando..."
-                        apt-get update && apt-get install -y python3 python3-pip python3-venv
-                        python3 --version
-                        pip3 --version
-                    else
-                        echo "Python3 ya está disponible: $(python3 --version)"
+                        echo "ERROR: Python3 no está instalado en el agente Jenkins. Por favor, instala Python3 y pip antes de ejecutar el pipeline."
+                        exit 1
                     fi
                     echo "Instalando locust..."
                     python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
@@ -118,10 +114,10 @@ pipeline {
                 '''
             }
         }
-        // Pruebas Unitarias solo en DEV
+        // Pruebas Unitarias solo en Stage
         stage('Unit Tests') {
             when {
-                environment name: 'SELECTED_ENV', value: 'dev'
+                environment name: 'SELECTED_ENV', value: 'stage'
             }
             steps {
                 sh '''
@@ -139,10 +135,10 @@ pipeline {
                 }
             }
         }
-        // Pruebas de Integración solo en DEV
+        // Pruebas de Integración solo en stage
         stage('Integration Tests') {
             when {
-                environment name: 'SELECTED_ENV', value: 'dev'
+                environment name: 'SELECTED_ENV', value: 'stage'
             }
             steps {
                 sh '''
