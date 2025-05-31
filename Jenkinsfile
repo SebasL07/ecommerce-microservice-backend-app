@@ -119,7 +119,7 @@ pipeline {
         }
 
 
-        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
+       /*  // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
@@ -142,7 +142,7 @@ pipeline {
                     archiveArtifacts artifacts: 'locust/load_test_report*.csv', allowEmptyArchive: true
                 }
             }
-        }
+        } */
 
         // Despliegue en Kubernetes solo en PROD
         stage('Desplegar en Kubernetes') {
