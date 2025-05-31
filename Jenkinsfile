@@ -270,6 +270,7 @@ pipeline {
             steps {
                 sh '''
                 export PATH=$HOME/bin:$PATH
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$HOME/.local/bin:$PATH
                 export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
                 echo "================ E2E Y PRUEBAS DE CARGA ================"
                 # Usar Python local para las pruebas (Python ya está configurado)
@@ -282,7 +283,7 @@ pipeline {
                 cd ../locust                
                 export PATH=$HOME/python3/bin:$PATH
                 # Usar el módulo de Python para ejecutar Locust con el archivo load_test.py
-                python3 -m locust --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report -f load_test.py
+                python3 -m locust --headless -u 100 -r 20 -t 30s --csv=load_test_report -f load_test.py
                 '''
             }
             post {
