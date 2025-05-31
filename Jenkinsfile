@@ -245,7 +245,7 @@ pipeline {
                 kubectl get pods
                 kubectl get services
                 echo "Realizando port forwarding para acceder a los servicios"
-                kubectl port-forward service/api-gateway 8080:8080 --address
+                kubectl port-forward service/api-gateway 8080:8080
                 '''
             }        }
           // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
