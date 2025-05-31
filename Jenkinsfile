@@ -16,7 +16,7 @@ pipeline {
     }
 
     stages {
-        stage('Preparar Entorno') {
+        /* stage('Preparar Entorno') {
             steps {
                 sh '''
                 echo "================ PREPARAR ENTORNO ================"
@@ -144,7 +144,7 @@ pipeline {
                 ./mvnw clean package "-DskipTests"
                 '''
             }
-        }
+        } */
         // Pruebas Unitarias solo en Stage
         /* stage('Unit Tests') {
             when {
