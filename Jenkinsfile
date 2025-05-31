@@ -54,7 +54,9 @@ pipeline {
                     echo 'export PATH=$HOME/maven/bin:$PATH' >> ~/.bashrc
                     cd -
                 fi
-                mvn --version                # Instalar Node.js y npm si no existen
+                mvn --version                
+                
+                # Instalar Node.js y npm si no existen
                 echo "Instalando Node.js binario..."
                 if ! command -v node &> /dev/null; then
                     rm -rf $HOME/nodejs
@@ -68,7 +70,8 @@ pipeline {
                 else
                     echo "Node.js ya está instalado"
                 fi
-                  # Asegurar que Node.js esté en el PATH
+                  
+                # Asegurar que Node.js esté en el PATH
                 export PATH=$HOME/nodejs/bin:$PATH
                 node --version
                 npm --version
@@ -99,6 +102,13 @@ pipeline {
                 else
                     echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
                 fi
+
+                echo "Instalando kubectl"
+                mkdir -p $HOME/bin
+                curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                chmod +x kubectl && mv kubectl $HOME/bin/
+                echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+                kubectl version --client
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
                 mvn --version
@@ -177,6 +187,8 @@ pipeline {
             }
             steps {
                 sh '''
+                export PATH=$HOME/bin:$PATH
+
                 echo "================ DESPLEGAR EN KUBERNETES ================"
                 echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
                 # Desplegar Zipkin
