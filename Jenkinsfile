@@ -16,7 +16,7 @@ pipeline {
     }
 
     stages {
-        /* stage('Preparar Entorno') {
+        stage('Preparar Entorno') {
             steps {
                 sh '''
                 echo "================ PREPARAR ENTORNO ================"
@@ -110,6 +110,19 @@ pipeline {
                     echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
                 fi
 
+                # Instalar GitHub CLI
+                echo "Instalando GitHub CLI..."
+                if ! command -v gh &> /dev/null; then
+                    # Instalar gh CLI
+                    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+                    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+                    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+                    apt update && apt install gh -y
+                    gh --version
+                else
+                    echo "GitHub CLI ya está disponible: $(gh --version)"
+                fi
+
                 # Instalar kubectl
                 echo "Verificando kubectl"
                 if ! command -v kubectl &> /dev/null; then
@@ -144,7 +157,7 @@ pipeline {
                 ./mvnw clean package "-DskipTests"
                 '''
             }
-        } */
+        } 
         // Pruebas Unitarias solo en Stage
         /* stage('Unit Tests') {
             when {
