@@ -190,8 +190,7 @@ pipeline {
             }
             steps {
                 sh '''
-
-                export PATH=$HOME/bin:$PATH
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
 
                 echo "================ DESPLEGAR EN KUBERNETES ================"
                 echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
@@ -230,10 +229,8 @@ pipeline {
             }
             steps {
                 sh '''
-                
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
 
-                export PATH=$HOME/bin:$PATH
-                
                 echo "================ VERIFICAR DESPLIEGUE Y PORT FORWARDING ================"
                 echo "Verificando el despliegue en ambiente ${SELECTED_ENV}"
                 kubectl get pods
