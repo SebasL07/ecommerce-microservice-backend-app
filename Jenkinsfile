@@ -249,7 +249,7 @@ pipeline {
                 
                 echo "Dejar que los servicios estén disponibles..."
                 # Esperar un tiempo para que los servicios estén disponibles
-                sleep 80
+                sleep 30
             
                 '''
             }        }
