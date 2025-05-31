@@ -117,9 +117,65 @@ pipeline {
                 }
             }
         }
+        
+        // Despliegue en Kubernetes solo en PROD
+        stage('Desplegar en Kubernetes') {
+            when {
+                environment name: 'SELECTED_ENV', value: 'prod'
+                environment name: 'SELECTED_ENV', value: 'stage'
+            }
+            steps {
+                sh '''
+                echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
+                
+                # Desplegar Zipkin
+                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin.yaml
+                sleep 30
+                
+                # Desplegar Service Discovery (Eureka)
+                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery.yaml
+                sleep 60
+                
+                # Desplegar Cloud Config
+                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config.yaml
+                sleep 60
+                
+                # Desplegar API Gateway
+                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway.yaml
+                sleep 60
+                
+                # Desplegar microservicios
+                kubectl apply -f kubernetes/${SELECTED_ENV}/05-user-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/06-product-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/07-order-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/08-payment-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/10-favourite-service.yaml
+                kubectl apply -f kubernetes/${SELECTED_ENV}/11-proxy-client.yaml
+                
+                echo "Verificando que todos los pods estén en ejecución"
+                kubectl get pods
+                '''
+            }
+        }
 
+        stage('Verificar Despliegue y port forwarding') {
+            when {
+                environment name: 'SELECTED_ENV', value: 'prod'
+            }
+            steps {
+                sh '''
+                echo "Verificando el despliegue en ambiente PROD"
+                kubectl get pods
+                kubectl get services
 
-       /*  // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
+                echo "Realizando port forwarding para acceder a los servicios"
+                kubectl port-forward service/api-gateway 8080:8080 --address
+                '''
+            }
+        }
+
+        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
@@ -142,60 +198,11 @@ pipeline {
                     archiveArtifacts artifacts: 'locust/load_test_report*.csv', allowEmptyArchive: true
                 }
             }
-        } */
+        } 
 
-        // Despliegue en Kubernetes solo en PROD
-        stage('Desplegar en Kubernetes') {
-            when {
-                environment name: 'SELECTED_ENV', value: 'prod'
-            }
-            steps {
-                sh '''
-                echo "Desplegando infraestructura en Kubernetes en ambiente PROD"
-                
-                # Desplegar Zipkin
-                kubectl apply -f kubernetes/prod/01-zipkin.yaml
-                sleep 30
-                
-                # Desplegar Service Discovery (Eureka)
-                kubectl apply -f kubernetes/prod/02-service-discovery.yaml
-                sleep 60
-                
-                # Desplegar Cloud Config
-                kubectl apply -f kubernetes/prod/03-cloud-config.yaml
-                sleep 60
-                
-                # Desplegar API Gateway
-                kubectl apply -f kubernetes/prod/04-api-gateway.yaml
-                sleep 60
-                
-                # Desplegar microservicios
-                kubectl apply -f kubernetes/prod/05-user-service.yaml
-                kubectl apply -f kubernetes/prod/06-product-service.yaml
-                kubectl apply -f kubernetes/prod/07-order-service.yaml
-                kubectl apply -f kubernetes/prod/08-payment-service.yaml
-                kubectl apply -f kubernetes/prod/09-shipping-service.yaml
-                kubectl apply -f kubernetes/prod/10-favourite-service.yaml
-                kubectl apply -f kubernetes/prod/11-proxy-client.yaml
-                
-                echo "Verificando que todos los pods estén en ejecución"
-                kubectl get pods
-                '''
-            }
-        }
+        
 
-        stage('Verificar Despliegue') {
-            when {
-                environment name: 'SELECTED_ENV', value: 'prod'
-            }
-            steps {
-                sh '''
-                echo "Verificando el despliegue en ambiente PROD"
-                kubectl get services
-                kubectl get pods
-                '''
-            }
-        }
+        
     }
 
     post {
