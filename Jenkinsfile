@@ -217,11 +217,17 @@ pipeline {
                 sleep 60
                 # Desplegar microservicios
                 kubectl apply -f kubernetes/${SELECTED_ENV}/05-proxy-client${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/06-order-service${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/07-payment-service${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/08-product-service${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/10-user-service${SUFFIX}.yaml
+                sleep 10
                 kubectl apply -f kubernetes/${SELECTED_ENV}/11-favourite-service${SUFFIX}.yaml
                 echo "Verificando que todos los pods estén en ejecución"
                 kubectl get pods
@@ -250,7 +256,7 @@ pipeline {
                 
                 echo "Dejar que los servicios estén disponibles..."
                 # Esperar un tiempo para que los servicios estén disponibles
-                sleep 60
+                sleep 80
             
                 '''
             }        }
