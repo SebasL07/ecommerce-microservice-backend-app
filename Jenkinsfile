@@ -205,9 +205,6 @@ pipeline {
                 # Desplegar Service Discovery (Eureka)
                 kubectl apply -f kubernetes/dev/02-service-discovery.yaml
                 sleep 60
-                # Desplegar Cloud Config
-                kubectl apply -f kubernetes/dev/03-cloud-config.yaml
-                sleep 60
                 # Desplegar API Gateway
                 kubectl apply -f kubernetes/dev/04-api-gateway.yaml
                 sleep 60
