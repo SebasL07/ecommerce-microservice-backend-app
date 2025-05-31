@@ -36,7 +36,7 @@ pipeline {
 
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
-                ./mvnw clean package "-DskipTests"
+                # ./mvnw clean package "-DskipTests"
                 
                 echo "Verificando Java para Maven:"
                 java -version
@@ -96,9 +96,16 @@ pipeline {
                     else
                         echo "Python3 ya está disponible: $(python3 --version)"
                     fi
+                      echo "Instalando locust..."
+                    # Instalar locust con pip
+                    python3 -m pip install --user locust --break-system-packages || python3 -m pip install --user locust
                     
-                    echo "Instalando locust..."
-                    python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
+                    # Verificar la instalación
+                    python3 -c "import locust; print(f'Locust instalado correctamente: {locust.__version__}')" || echo "Error al importar locust"
+                    
+                    # Asegurarse de que el directorio bin de pip esté en el PATH
+                    export PATH=$HOME/.local/bin:$PATH
+                    echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
                 else
                     echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
                 fi
@@ -271,11 +278,11 @@ pipeline {
                 cd postman_e2e_test
                 export PATH=$HOME/nodejs/bin:$PATH
                 newman run "Ecommerce e2e test.postman_collection.json"
-                
-                echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
+                  echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
                 cd ../locust
                 export PATH=$HOME/python3/bin:$PATH
-                python3 -m locust --host=http://localhost:8089 --headless -u 100 -r 20 -t 30s --csv=load_test_report -f locustfile.py
+                # Usar el módulo de Python para ejecutar Locust con el archivo load_test.py
+                python3 -m locust --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report -f load_test.py
                 '''
             }
             post {
