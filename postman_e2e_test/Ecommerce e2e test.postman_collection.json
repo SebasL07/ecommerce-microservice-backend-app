@@ -85,19 +85,60 @@
 					"response": []
 				},
 				{
-					"name": "get user",
+					"name": "create credential",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"credentialId\": 5,\r\n    \"username\": \"carlitos\",\r\n    \"password\": \"$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy\",\r\n    \"roleBasedAuthority\": \"ROLE_USER\",\r\n    \"isEnabled\": true,\r\n    \"isAccountNonExpired\": true,\r\n    \"isAccountNonLocked\": true,\r\n    \"isCredentialsNonExpired\": true,\r\n    \"userDto\" : {\r\n        \"userId\" : {{userId}}\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{base_url}}/user-service/api/users{{userId}}",
+							"raw": "{{base_url}}/user-service/api/users",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"user-service",
 								"api",
-								"users{{userId}}"
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user-service/api/users/{{userId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-service",
+								"api",
+								"users",
+								"{{userId}}"
 							]
 						}
 					},
@@ -285,11 +326,23 @@
 				},
 				{
 					"name": "get favourite",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"{{userId}}\",\r\n  \"productId\": \"{{productId}}\",\r\n  \"likeDate\": \"25-05-2025__12:30:00:000000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{base_url}}/favourite-service/api/favourites/finde¿",
+							"raw": "{{base_url}}/favourite-service/api/favourites/find",
 							"host": [
 								"{{base_url}}"
 							],
@@ -297,7 +350,7 @@
 								"favourite-service",
 								"api",
 								"favourites",
-								"finde¿"
+								"find"
 							]
 						}
 					},
@@ -475,9 +528,21 @@
 				},
 				{
 					"name": "get shipping",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": \"{{productId}}\",\r\n  \"orderId\": \"{{orderId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{base_url}}/shipping-service/api/shippings/find",
 							"host": [
@@ -521,7 +586,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080",
+			"value": "http://localhost:8081",
 			"type": "string"
 		},
 		{
@@ -553,6 +618,11 @@
 			"key": "paymentId",
 			"value": "",
 			"type": "default"
+		},
+		{
+			"key": "credentialId",
+			"value": "",
+			"type": "string"
 		}
 	]
 }

@@ -6,15 +6,15 @@
 declare -A WAIT_TIMES
 WAIT_TIMES=(
     ["01-zipkin.yaml"]=10
-    ["02-service-discovery.yaml"]=150  # Eureka necesita más tiempo para iniciar
-    ["03-cloud-config.yaml"]=80       # Config Server también necesita tiempo
-    ["04-api-gateway.yaml"]=30
-    ["05-proxy-client.yaml"]=30
-    ["06-order-service.yaml"]=20
+    ["02-service-discovery.yaml"]=40  # Eureka necesita más tiempo para iniciar
+   # ["03-cloud-config.yaml"]=80       # Config Server también necesita tiempo
+    ["04-api-gateway.yaml"]=10
+    ["05-proxy-client.yaml"]=10
+    ["06-order-service.yaml"]=10
     ["07-payment-service.yaml"]=15
     ["08-product-service.yaml"]=15
     ["09-shipping-service.yaml"]=15
-    ["10-user-service.yaml"]=20
+    ["10-user-service.yaml"]=10
     ["11-favourite-service.yaml"]=0   # El último servicio no necesita espera
 )
 
@@ -77,7 +77,9 @@ while [ $connection_attempts -lt $max_attempts ]; do
 done
 
 # Directorio de trabajo
-KUBERNETES_DIR="$(dirname "$0")/kubernetes"
+KUBERNETES_DIR="$(dirname "$0")/kubernetes/dev"
+
+
 
 # Aplicar cada archivo YAML en orden
 for yaml_file in "${YAML_FILES[@]}"; do
@@ -136,7 +138,7 @@ kubectl get services
 # Instrucciones para acceder a la aplicación
 print_message "============================================" "$YELLOW"
 print_message "Para acceder a la aplicación:" "$YELLOW"
-print_message "1. API Gateway: kubectl port-forward service/api-gateway 8080:8080" "$YELLOW"
+print_message "1. API Gateway: kubectl port-forward service/api-gateway 8081:8081" "$YELLOW"
 print_message "2. Service Discovery (Eureka): kubectl port-forward service/service-discovery 8761:8761" "$YELLOW"
 print_message "3. Zipkin: kubectl port-forward service/zipkin 9411:9411" "$YELLOW"
 print_message "============================================" "$YELLOW"
