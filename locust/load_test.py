@@ -3,11 +3,11 @@ from locust import HttpUser, task, between
 class Test(HttpUser):
     wait_time = between(1, 5)
 
-    host = "http://api-gateway:8080"
+    host = "http://api-gateway:8080/"
 
     @task
     def get_users(self):
-        self.client.get("/user-service/api/users")
+        self.client.get("user-service/api/users")
 
     @task
     def get_products(self):
