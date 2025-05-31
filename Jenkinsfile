@@ -88,12 +88,20 @@ pipeline {
                     fi
                 else
                     echo "Saltando verificación de Docker para ambiente ${SELECTED_ENV}"
-                fi                # Verificar Docker para contenedores
+                fi
+
+                # Verificar que Python3 esté disponible
+                export PATH=$HOME/python3/bin:$PATH
+                python3 --version
+
+                # Instalar Python3 y Locust solo en stage
                 if [ "${SELECTED_ENV}" = "stage" ]; then
-                    if ! command -v docker &> /dev/null; then
-                        echo "ADVERTENCIA: Docker no está instalado o no está en el PATH"
-                        exit 1
-                    fi
+                    echo "Verificando e instalando Python para Locust..."
+                    export PATH=$HOME/python3/bin:$PATH
+                    echo "Instalando locust..."
+                    python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
+                else
+                    echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
                 fi
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
@@ -101,7 +109,7 @@ pipeline {
                 node --version
                 npm --version
                 newman --version
-                docker --version || echo "Docker no está disponible"
+                python3 -m locust --version || echo "Locust pendiente de verificar en PATH"
                 echo "============================================"
                 '''
             }
