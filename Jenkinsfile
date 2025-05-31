@@ -175,7 +175,7 @@ pipeline {
         }
         */
         
-
+/* 
         // Despliegue en Kubernetes en STAGE y PROD
         stage('Desplegar en Kubernetes') {
             when {
@@ -201,13 +201,13 @@ pipeline {
                 
                 # Desplegar Zipkin
                 kubectl apply -f kubernetes/dev/01-zipkin.yaml
-                sleep 30
+                sleep 10
                 # Desplegar Service Discovery (Eureka)
                 kubectl apply -f kubernetes/dev/02-service-discovery.yaml
-                sleep 60
+                sleep 40
                 # Desplegar API Gateway
                 kubectl apply -f kubernetes/dev/04-api-gateway.yaml
-                sleep 60
+                sleep 30
                 # Desplegar microservicios
                 kubectl apply -f kubernetes/dev/05-proxy-client.yaml
                 sleep 10
@@ -252,7 +252,9 @@ pipeline {
                 sleep 30
             
                 '''
-            }        }
+            }        
+        } */
+
           // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
             when {
