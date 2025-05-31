@@ -103,12 +103,15 @@ pipeline {
                     echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
                 fi
 
-                echo "Instalando kubectl"
-                mkdir -p $HOME/bin
-                curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                chmod +x kubectl && mv kubectl $HOME/bin/
-                echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
-                kubectl version --client
+                # Instalar kubectl
+                echo "Verificando kubectl"
+                if ! command -v kubectl &> /dev/null; then
+                    echo "Instalando kubectl"
+                    mkdir -p $HOME/bin
+                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    chmod +x kubectl && mv kubectl $HOME/bin/
+                    echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+                fi
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
                 mvn --version
@@ -187,6 +190,7 @@ pipeline {
             }
             steps {
                 sh '''
+
                 export PATH=$HOME/bin:$PATH
 
                 echo "================ DESPLEGAR EN KUBERNETES ================"
@@ -226,6 +230,10 @@ pipeline {
             }
             steps {
                 sh '''
+                
+
+                export PATH=$HOME/bin:$PATH
+                
                 echo "================ VERIFICAR DESPLIEGUE Y PORT FORWARDING ================"
                 echo "Verificando el despliegue en ambiente ${SELECTED_ENV}"
                 kubectl get pods
@@ -241,6 +249,8 @@ pipeline {
             }
             steps {
                 sh '''
+                export PATH=$HOME/bin:$PATH
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
                 echo "================ E2E Y PRUEBAS DE CARGA ================"
                 # Usar Python local para las pruebas (Python ya está configurado)
                 
