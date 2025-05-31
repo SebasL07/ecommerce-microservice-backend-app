@@ -187,10 +187,11 @@ pipeline {
                     environment name: 'SELECTED_ENV', value: 'prod'
                     environment name: 'SELECTED_ENV', value: 'stage'
                 }
-            }
+            }            
             steps {
                 sh '''
-                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH                echo "================ DESPLEGAR EN KUBERNETES ================"
+                export PATH=$HOME/bin:$HOME/maven/bin:$HOME/nodejs/bin:$PATH
+                echo "================ DESPLEGAR EN KUBERNETES ================"
                 echo "Desplegando infraestructura en Kubernetes en ambiente ${SELECTED_ENV}"
                 
                 # Variables para los sufijos de los archivos
