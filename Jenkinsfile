@@ -54,9 +54,7 @@ pipeline {
                     echo 'export PATH=$HOME/maven/bin:$PATH' >> ~/.bashrc
                     cd -
                 fi
-                mvn --version
-
-                # Instalar Node.js y npm si no existen
+                mvn --version                # Instalar Node.js y npm si no existen
                 echo "Instalando Node.js binario..."
                 if ! command -v node &> /dev/null; then
                     rm -rf $HOME/nodejs
@@ -67,28 +65,48 @@ pipeline {
                     export PATH=$HOME/nodejs/bin:$PATH
                     echo 'export PATH=$HOME/nodejs/bin:$PATH' >> ~/.bashrc
                     cd -
+                else
+                    echo "Node.js ya está instalado"
                 fi
+                
+                # Asegurar que Node.js esté en el PATH
+                export PATH=$HOME/nodejs/bin:$PATH
                 node --version
-                npm --version
-
-                # Instalar newman globalmente
+                npm --version# Instalar newman globalmente
                 echo "Instalando newman..."
                 npm install -g newman
                 newman --version
 
-                # Verificar instalación de Python3
+                # Instalar Python3 si no existe
+                echo "Verificando Python3..."
                 if ! command -v python3 &> /dev/null; then
-                    echo "ERROR: Python3 no está instalado en el agente Jenkins. Por favor, instala Python3 y pip antes de ejecutar el pipeline."
-                    exit 1
+                    echo "Python3 no encontrado. Instalando Python3..."
+                    cd /tmp
+                    curl -L -o Python-3.9.18.tgz https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz
+                    tar -xzf Python-3.9.18.tgz
+                    cd Python-3.9.18
+                    ./configure --prefix=$HOME/python3 --enable-optimizations
+                    make -j$(nproc)
+                    make altinstall
+                    cd ..
+                    rm -rf Python-3.9.18*
+                    export PATH=$HOME/python3/bin:$PATH
+                    echo 'export PATH=$HOME/python3/bin:$PATH' >> ~/.bashrc
+                    ln -sf $HOME/python3/bin/python3.9 $HOME/python3/bin/python3
+                    ln -sf $HOME/python3/bin/pip3.9 $HOME/python3/bin/pip3
+                    cd -
+                else
+                    echo "Python3 ya está instalado"
                 fi
+
+                # Verificar que Python3 esté disponible
+                export PATH=$HOME/python3/bin:$PATH
+                python3 --version
 
                 # Instalar Python3 y Locust solo en stage
                 if [ "${SELECTED_ENV}" = "stage" ]; then
                     echo "Verificando e instalando Python para Locust..."
-                    if ! command -v python3 &> /dev/null; then
-                        echo "ERROR: Python3 no está instalado en el agente Jenkins. Por favor, instala Python3 y pip antes de ejecutar el pipeline."
-                        exit 1
-                    fi
+                    export PATH=$HOME/python3/bin:$PATH
                     echo "Instalando locust..."
                     python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
                 else
@@ -218,18 +236,22 @@ pipeline {
                 '''
             }
         }
-        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
-        stage('E2E y Pruebas de Carga') {
+        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE        stage('E2E y Pruebas de Carga') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
             steps {
                 sh '''
                 echo "================ E2E Y PRUEBAS DE CARGA ================"
+                # Configurar variables de entorno
+                export PATH=$HOME/python3/bin:$PATH
+                export PATH=$HOME/nodejs/bin:$PATH
+                
                 echo "Ejecutando pruebas E2E con Postman/Newman en ambiente STAGE"
                 cd postman_e2e_test
                 docker build -t e2e-tests .
                 docker run --network host --rm e2e-tests
+                
                 echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
                 cd ../locust
                 docker build -t locust-tests .
@@ -241,7 +263,7 @@ pipeline {
                     archiveArtifacts artifacts: 'locust/load_test_report*.csv', allowEmptyArchive: true
                 }
             }
-        } 
+        }
  
     }
 
