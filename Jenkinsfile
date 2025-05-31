@@ -71,10 +71,6 @@ pipeline {
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
                 ./mvnw clean package -DskipTests
-                
-                echo "Verificando Java para Maven:"
-                java -version
-                javac -version
 
                 ./mvnw clean package -DskipTests
                 '''
@@ -88,6 +84,11 @@ pipeline {
             }
             steps {
                 sh '''
+                export PATH=$HOME/bin:$PATH
+                
+                export JAVA_HOME=$HOME/java11
+                export PATH=$HOME/java11/bin:$PATH
+                
                 echo "Ejecutando pruebas unitarias y de integración en ambiente DEV"
                 ./mvnw clean verify -DskipTests=false
                 '''
@@ -99,22 +100,6 @@ pipeline {
             }
         }
 
-        stage('Build and Push Docker Images') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-credentials',
-                    usernameVariable: 'DOCKER_USERNAME',
-                    passwordVariable: 'DOCKER_PASSWORD'
-                )]) {
-                    sh '''
-                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                    docker-compose -f compose.yml build
-                    docker-compose -f compose.yml push
-                    docker logout
-                    '''
-                }
-            }
-        }
 
         // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
