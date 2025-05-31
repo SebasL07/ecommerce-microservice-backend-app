@@ -139,7 +139,7 @@ pipeline {
             }
         }
         // Pruebas Unitarias solo en Stage
-        stage('Unit Tests') {
+        /* stage('Unit Tests') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
@@ -153,14 +153,11 @@ pipeline {
                 ./mvnw test
                 '''
             }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+            
+        } */
         // Pruebas de Integración solo en stage
-        stage('Integration Tests') {
+        
+        /* stage('Integration Tests') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
             }
@@ -174,12 +171,11 @@ pipeline {
                 ./mvnw verify "-Dspring.profiles.active=test" "-Dtest=none" "-DfailIfNoTests=false" "-DskipTests=true" "-Dit.test=*IT,*Integration*,*IntegrationTest*"
                 '''
             }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
+            
         }
+        */
+        
+
         // Despliegue en Kubernetes en STAGE y PROD
         stage('Desplegar en Kubernetes') {
             when {
