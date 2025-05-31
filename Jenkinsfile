@@ -76,42 +76,24 @@ pipeline {
                 # Instalar newman globalmente
                 echo "Instalando newman..."
                 npm install -g newman
-                newman --version
-
-                # Instalar Python3 si no existe
-                echo "Verificando Python3..."
-                if ! command -v python3 &> /dev/null; then
-                    echo "Python3 no encontrado. Instalando Python3..."
-                    cd /tmp
-                    curl -L -o Python-3.9.18.tgz https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz
-                    tar -xzf Python-3.9.18.tgz
-                    cd Python-3.9.18
-                    ./configure --prefix=$HOME/python3 --enable-optimizations
-                    make -j$(nproc)
-                    make altinstall
-                    cd ..
-                    rm -rf Python-3.9.18*
-                    export PATH=$HOME/python3/bin:$PATH
-                    echo 'export PATH=$HOME/python3/bin:$PATH' >> ~/.bashrc
-                    ln -sf $HOME/python3/bin/python3.9 $HOME/python3/bin/python3
-                    ln -sf $HOME/python3/bin/pip3.9 $HOME/python3/bin/pip3
-                    cd -
+                newman --version                if [ "${SELECTED_ENV}" = "stage" ]; then
+                    echo "Verificando Docker para pruebas de carga..."
+                    # Verificar si Docker está instalado
+                    if ! command -v docker &> /dev/null; then
+                        echo "ADVERTENCIA: Docker no está disponible. Las pruebas con Locust podrían fallar."
+                    else
+                        echo "Docker está disponible: $(docker --version)"
+                        # Pre-pull de imágenes para acelerar las pruebas
+                        docker pull python:3.11-slim
+                    fi
                 else
-                    echo "Python3 ya está instalado"
-                fi
-
-                # Verificar que Python3 esté disponible
-                export PATH=$HOME/python3/bin:$PATH
-                python3 --version
-
-                # Instalar Python3 y Locust solo en stage
+                    echo "Saltando verificación de Docker para ambiente ${SELECTED_ENV}"
+                fi                # Verificar Docker para contenedores
                 if [ "${SELECTED_ENV}" = "stage" ]; then
-                    echo "Verificando e instalando Python para Locust..."
-                    export PATH=$HOME/python3/bin:$PATH
-                    echo "Instalando locust..."
-                    python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
-                else
-                    echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
+                    if ! command -v docker &> /dev/null; then
+                        echo "ADVERTENCIA: Docker no está instalado o no está en el PATH"
+                        exit 1
+                    fi
                 fi
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
@@ -119,7 +101,7 @@ pipeline {
                 node --version
                 npm --version
                 newman --version
-                python3 -m locust --version || echo "Locust pendiente de verificar en PATH"
+                docker --version || echo "Docker no está disponible"
                 echo "============================================"
                 '''
             }
@@ -236,8 +218,7 @@ pipeline {
                 kubectl port-forward service/api-gateway 8080:8080 --address
                 '''
             }        }
-        
-        // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
+          // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
         stage('E2E y Pruebas de Carga') {
             when {
                 environment name: 'SELECTED_ENV', value: 'stage'
@@ -245,9 +226,7 @@ pipeline {
             steps {
                 sh '''
                 echo "================ E2E Y PRUEBAS DE CARGA ================"
-                # Configurar variables de entorno
-                export PATH=$HOME/python3/bin:$PATH
-                export PATH=$HOME/nodejs/bin:$PATH
+                # Usar Docker para las pruebas (no requiere Python instalado localmente)
                 
                 echo "Ejecutando pruebas E2E con Postman/Newman en ambiente STAGE"
                 cd postman_e2e_test
@@ -256,7 +235,9 @@ pipeline {
                 
                 echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
                 cd ../locust
+                # Construir contenedor con Locust
                 docker build -t locust-tests .
+                # Ejecutar pruebas de carga desde el contenedor
                 docker run --network host --rm locust-tests --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report
                 '''
             }
