@@ -75,10 +75,9 @@ pipeline {
                 ./mvnw clean package -DskipTests
                 '''
             }
-        }
-
-        // Pruebas Unitarias y de Integración solo en DEV
-        stage('Unit and Integration Tests') {
+        }        
+        // Pruebas Unitarias solo en DEV
+        stage('Unit Tests') {
             when {
                 environment name: 'SELECTED_ENV', value: 'dev'
             }
@@ -89,13 +88,35 @@ pipeline {
                 export JAVA_HOME=$HOME/java11
                 export PATH=$HOME/java11/bin:$PATH
                 
-                echo "Ejecutando pruebas unitarias y de integración en ambiente DEV"
-                ./mvnw clean verify -DskipTests=false
+                echo "Ejecutando pruebas unitarias en ambiente DEV"
+                ./mvnw test
                 '''
             }
             post {
                 always {
                     junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
+        // Pruebas de Integración solo en DEV
+        stage('Integration Tests') {
+            when {
+                environment name: 'SELECTED_ENV', value: 'dev'
+            }
+            steps {
+                sh '''
+                export PATH=$HOME/bin:$PATH
+                
+                export JAVA_HOME=$HOME/java11
+                export PATH=$HOME/java11/bin:$PATH
+                  echo "Ejecutando pruebas de integración en ambiente DEV"
+                ./mvnw verify -Dspring.profiles.active=test -Dtest=none -DfailIfNoTests=false -DskipTests=true -Dit.test=*IT,*Integration*,*IntegrationTest*
+                '''
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
                 }
             }
         }

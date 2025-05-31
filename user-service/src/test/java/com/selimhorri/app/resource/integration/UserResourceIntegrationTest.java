@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class UserResourceIntegrationTest {
 
     @LocalServerPort
