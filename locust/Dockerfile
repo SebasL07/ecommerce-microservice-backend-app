@@ -6,7 +6,7 @@ RUN pip install --no-cache-dir locust
 
 # Copiar archivos de pruebas
 WORKDIR /locust
-COPY locust.py .
+COPY load_test.py ./
 
 # Comando por defecto (puede ser sobrescrito al ejecutar el contenedor)
 ENTRYPOINT ["locust"]

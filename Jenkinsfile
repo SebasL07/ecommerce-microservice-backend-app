@@ -279,7 +279,7 @@ pipeline {
                 export PATH=$HOME/nodejs/bin:$PATH
                 newman run "Ecommerce e2e test.postman_collection.json"
                   echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
-                cd ../locust
+                cd ../locust                
                 export PATH=$HOME/python3/bin:$PATH
                 # Usar el módulo de Python para ejecutar Locust con el archivo load_test.py
                 python3 -m locust --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report -f load_test.py
