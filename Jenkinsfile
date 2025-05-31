@@ -77,7 +77,7 @@ pipeline {
                 echo "Instalando newman..."
                 npm install -g newman
                 newman --version                
-                
+
                 if [ "${SELECTED_ENV}" = "stage" ]; then
                     echo "Verificando Docker para pruebas de carga..."
                     # Verificar si Docker está instalado
@@ -97,14 +97,12 @@ pipeline {
                 python3 --version
 
                 # Instalar Python3 y Locust solo en stage
-                if [ "${SELECTED_ENV}" = "stage" ]; then
-                    echo "Verificando e instalando Python para Locust..."
-                    export PATH=$HOME/python3/bin:$PATH
-                    echo "Instalando locust..."
-                    python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
-                else
-                    echo "Saltando instalación de Locust para ambiente ${SELECTED_ENV}"
-                fi
+                
+                echo "Verificando e instalando Python para Locust..."
+                export PATH=$HOME/python3/bin:$PATH
+                echo "Instalando locust..."
+                python3 -m pip install --user locust --break-system-packages || pip3 install --user locust --break-system-packages
+                    
 
                 echo "=== RESUMEN DE HERRAMIENTAS INSTALADAS ==="
                 mvn --version
@@ -236,19 +234,17 @@ pipeline {
             steps {
                 sh '''
                 echo "================ E2E Y PRUEBAS DE CARGA ================"
-                # Usar Docker para las pruebas (no requiere Python instalado localmente)
+                # Usar Python local para las pruebas (Python ya está configurado)
                 
                 echo "Ejecutando pruebas E2E con Postman/Newman en ambiente STAGE"
                 cd postman_e2e_test
-                docker build -t e2e-tests .
-                docker run --network host --rm e2e-tests
+                export PATH=$HOME/nodejs/bin:$PATH
+                newman run "Ecommerce e2e test.postman_collection.json"
                 
                 echo "Ejecutando pruebas de carga con Locust en ambiente STAGE"
                 cd ../locust
-                # Construir contenedor con Locust
-                docker build -t locust-tests .
-                # Ejecutar pruebas de carga desde el contenedor
-                docker run --network host --rm locust-tests --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report
+                export PATH=$HOME/python3/bin:$PATH
+                python3 -m locust --host=http://localhost:8080 --headless -u 100 -r 20 -t 30s --csv=load_test_report -f locust.py
                 '''
             }
             post {
