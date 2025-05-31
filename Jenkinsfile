@@ -40,10 +40,23 @@ pipeline {
                 java -version
                 javac -version
 
-                java -version || true
-                mvn --version || true
-                node --version || true
-                npm --version || true
+                
+                echo "Verificando Maven..."
+                if ! command -v mvn &> /dev/null; then
+                    echo "Instalando Maven..."
+                   
+                    rm -rf $HOME/maven
+                    cd /tmp
+                    curl -sL https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -o apache-maven-3.8.6-bin.tar.gz
+                    tar -xzf apache-maven-3.8.6-bin.tar.gz
+                    mv apache-maven-3.8.6 $HOME/maven
+                    export PATH=$HOME/maven/bin:$PATH
+                    echo 'export PATH=$HOME/maven/bin:$PATH' >> ~/.bashrc
+                    cd -
+                fi
+                
+                mvn --version
+
                 '''
             }
         }
