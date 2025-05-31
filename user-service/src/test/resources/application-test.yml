@@ -7,7 +7,7 @@ spring:
   zipkin:
     enabled: false
   config:
-    import: optional:configserver:
+    import: "optional:configserver:"
   cloud:
     discovery:
       enabled: false
