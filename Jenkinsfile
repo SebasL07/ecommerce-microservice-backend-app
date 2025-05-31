@@ -204,31 +204,31 @@ pipeline {
                 fi
                 
                 # Desplegar Zipkin
-                kubectl apply -f kubernetes/${SELECTED_ENV}/01-zipkin${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/01-zipkin.yaml
                 sleep 30
                 # Desplegar Service Discovery (Eureka)
-                kubectl apply -f kubernetes/${SELECTED_ENV}/02-service-discovery${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/02-service-discovery.yaml
                 sleep 60
                 # Desplegar Cloud Config
-                kubectl apply -f kubernetes/${SELECTED_ENV}/03-cloud-config${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/03-cloud-config.yaml
                 sleep 60
                 # Desplegar API Gateway
-                kubectl apply -f kubernetes/${SELECTED_ENV}/04-api-gateway${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/04-api-gateway.yaml
                 sleep 60
                 # Desplegar microservicios
-                kubectl apply -f kubernetes/${SELECTED_ENV}/05-proxy-client${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/05-proxy-client.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/06-order-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/06-order-service.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/07-payment-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/07-payment-service.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/08-product-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/08-product-service.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/09-shipping-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/09-shipping-service.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/10-user-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/10-user-service.yaml
                 sleep 10
-                kubectl apply -f kubernetes/${SELECTED_ENV}/11-favourite-service${SUFFIX}.yaml
+                kubectl apply -f kubernetes/dev/11-favourite-service.yaml
                 echo "Verificando que todos los pods estén en ejecución"
                 kubectl get pods
                 '''
