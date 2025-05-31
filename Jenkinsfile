@@ -248,6 +248,10 @@ pipeline {
                 echo "Servicios desplegados correctamente. En lugar de hacer port-forwarding, simplemente verificaremos que los servicios estén disponibles."
                 kubectl get service api-gateway -o wide
                 
+                echo "Dejar que los servicios estén disponibles..."
+                # Esperar un tiempo para que los servicios estén disponibles
+                sleep 60
+            
                 '''
             }        }
           // Pruebas E2E con Postman/Newman y de Carga con Locust solo en STAGE
