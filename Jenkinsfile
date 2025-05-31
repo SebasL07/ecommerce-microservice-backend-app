@@ -14,7 +14,7 @@ pipeline {
         K8S_NAMESPACE = "default"
         SELECTED_ENV = "${params.ENVIRONMENT}"
     }
-    
+
     stages {
         stage('Preparar Entorno') {
             steps {
@@ -22,6 +22,23 @@ pipeline {
                 echo "Preparando entorno para: ${SELECTED_ENV}"
 
                 export PATH=$HOME/bin:$PATH
+
+                # Instalar Java 11 para Maven (el proyecto requiere Java 11)
+                echo "Instalando Java 11 para Maven..."
+                if [ ! -d $HOME/java11 ]; then
+                    cd /tmp
+                    curl -L -o openjdk-11.tar.gz https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+                    tar -xzf openjdk-11.tar.gz
+                    mv jdk-11.0.2 $HOME/java11
+                    cd -
+                fi
+
+                export JAVA_HOME=$HOME/java11
+                export PATH=$HOME/java11/bin:$PATH
+                
+                echo "Verificando Java para Maven:"
+                java -version
+                javac -version
 
                 java -version || true
                 mvn --version || true
