@@ -3,7 +3,7 @@ from locust import HttpUser, task, between
 class Test(HttpUser):
     wait_time = between(1, 5)
 
-    host = "http://localhost:8080"
+    host = "http://api-gateway:8080"
 
     @task
     def get_users(self):
@@ -20,10 +20,6 @@ class Test(HttpUser):
     @task
     def get_orders(self):
         self.client.get("order-service/api/orders")
-
-    @task
-    def get_credentials(self):
-        self.client.get("user-service/api/credentials")
 
     @task
     def get_payments(self):
