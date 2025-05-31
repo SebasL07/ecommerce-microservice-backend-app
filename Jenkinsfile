@@ -349,13 +349,14 @@ pipeline {
             }
         }
  
-    }
-
+    }    
+    
     post {
         always {
             echo "Limpiando espacio de trabajo..."
             cleanWs()
-        }        success {
+        }
+        success {
             script {
                 if (env.SELECTED_ENV == 'dev') {
                     echo "¡Pipeline DEV completado con éxito!"
